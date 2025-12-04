@@ -21,10 +21,10 @@ It solves problems of the form,
 
 and is used as in the following example which uses QP solver Gurobi and sparse symmetric indefinite linear solver [[QDLDL]](https://github.com/osqp/qdldl-python),
 
-```bash
+```python
 # import dQP and a tool to load example differentiable parameters
-from src import dQP
-from src.sparse_helper import initialize_torch_from_npz
+from dqp import dQP
+from dqp.sparse_helper import initialize_torch_from_npz
 
 # initialize dQP and parameters
 settings = dQP.build_settings(solve_type="sparse",qp_solver="gurobi",lin_solver="qdldl")
@@ -52,7 +52,28 @@ This is illustrated below, where a QP is <u>locally</u> equivalent to a purely e
 
 ## Installation
 
-To use dQP, you'll need the files in /src. We also provide a sample environment set-up here.
+### Install as a Package (Recommended)
+
+The easiest way to use dQP is to install it as a Python package:
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/dQP.git
+cd dQP
+
+# Install with pip (editable mode for development)
+pip install -e .
+
+# Install with OSQP solver support
+pip install -e ".[osqp]"
+
+# Install with all supported solvers
+pip install -e ".[full]"
+```
+
+### Manual Environment Setup
+
+Alternatively, you can set up the environment manually:
 
 ```bash
 conda create -y --name dQP python=3.9
@@ -65,6 +86,49 @@ pip install torch_geometric torch_scatter torch_sparse -f https://data.pyg.org/w
 
 This includes PyTorch, open-source python interfaces to various QP and linear solvers, and tools for sparsity. Some QP solvers such as Gurobi are commercial, but offer [[academic licenses]](https://www.gurobi.com/academia/academic-program-and-licenses/). 
 Experiment-specific packages are detailed in the experiment section.
+
+## Quick Start with OSQP
+
+Here's a simple example using the OSQP solver:
+
+```python
+import torch
+import numpy as np
+from scipy.sparse import csc_matrix
+
+from dqp import dQP
+from dqp.sparse_helper import csc_scipy_to_torch
+
+# Define a simple QP: minimize x1^2 + x2^2 s.t. x1 + x2 >= 1, x >= 0
+P = csc_matrix(np.array([[2.0, 0.0], [0.0, 2.0]]))
+q = np.array([0.0, 0.0])
+C = csc_matrix(np.array([[-1.0, -1.0], [-1.0, 0.0], [0.0, -1.0]]))
+d = np.array([-1.0, 0.0, 0.0])
+
+# Convert to PyTorch tensors
+P_torch = csc_scipy_to_torch(P)
+q_torch = torch.tensor(q, dtype=torch.float64, requires_grad=True)
+C_torch = csc_scipy_to_torch(C)
+d_torch = torch.tensor(d, dtype=torch.float64, requires_grad=True)
+
+# Build settings with OSQP solver
+settings = dQP.build_settings(
+    solve_type="sparse",
+    qp_solver="osqp",
+    lin_solver="scipy SPLU",
+)
+
+# Create layer and solve
+layer = dQP.dQP_layer(settings=settings)
+x_star, lambda_star, mu_star, _, _ = layer(P_torch, q_torch, C_torch, d_torch)
+
+# Backpropagate
+x_star.sum().backward()
+print(f"Solution: {x_star.detach().numpy()}")  # [0.5, 0.5]
+print(f"Gradient w.r.t. d: {d_torch.grad.numpy()}")
+```
+
+For more examples, see `examples/osqp_example.py`.
 
 ## Options
 

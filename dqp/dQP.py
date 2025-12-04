@@ -18,10 +18,9 @@ src_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(src_dir)
 sys.path.append(parent_dir)
 
-from src.set_solver_tolerance import set_solver_tolerance
-
-import src.sparse_helper as sparse_helper
-import src.lin_solvers as lin_solvers
+from .set_solver_tolerance import set_solver_tolerance
+from . import sparse_helper
+from . import lin_solvers
 import time
 
 # CPU parallelism
