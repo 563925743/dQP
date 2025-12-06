@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dqp"
+version = "0.1.0"
+description = "Differentiation Through Black-Box Quadratic Programming Solvers"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Magoon"},
+    {name = "Yang"},
+    {name = "Aigerman"},
+    {name = "Kovalsky"},
+]
+keywords = ["quadratic programming", "differentiation", "optimization", "pytorch", "machine learning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+dependencies = [
+    "torch>=2.0.0",
+    "numpy",
+    "scipy",
+    "qpsolvers",
+    "joblib",
+]
+
+[project.optional-dependencies]
+osqp = ["osqp"]
+full = [
+    "clarabel",
+    "cvxopt",
+    "daqp",
+    "ecos",
+    "gurobipy",
+    "highspy",
+    "mosek",
+    "osqp",
+    "piqp",
+    "proxsuite",
+    "qpalm",
+    "quadprog",
+    "scs",
+    "qdldl",
+    "pypardiso",
+]
+dev = [
+    "pytest",
+    "matplotlib",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/your-org/dQP"
+"Paper" = "https://arxiv.org/pdf/2410.06324"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dqp*", "deps*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.npz", "*.txt"]
