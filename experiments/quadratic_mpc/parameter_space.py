@@ -3,7 +3,7 @@ import numpy as np
 import sys
 sys.path.append('../../')
 
-from src import dQP
+from dqp import dQP
 
 import torch
 import time
@@ -14,7 +14,7 @@ import matplotlib as mpl
 from integer_pairing import cantor
 from sklearn import svm
 
-from src.qp_diagnostic import get_full_D
+from dqp.qp_diagnostic import get_full_D
 
 import qpsolvers
 

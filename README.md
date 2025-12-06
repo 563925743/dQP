@@ -19,77 +19,7 @@ It solves problems of the form,
 <img src="images/QP_formulation.png" alt="QP" width="500"/>
 </p>
 
-and is used as in the following example which uses QP solver Gurobi and sparse symmetric indefinite linear solver [[QDLDL]](https://github.com/osqp/qdldl-python),
-
-```python
-# import dQP and a tool to load example differentiable parameters
-from dqp import dQP
-from dqp.sparse_helper import initialize_torch_from_npz
-
-# initialize dQP and parameters
-settings = dQP.build_settings(solve_type="sparse",qp_solver="gurobi",lin_solver="qdldl")
-dQP_layer = dQP.dQP_layer(settings=settings)
-P,q,C,d,A,b = initialize_torch_from_npz("experiments/diagnostic/data/cross.npz")
-
-# == solve QP ==
-z_star,lambda_star,mu_star,_,_ = dQP_layer(P,q,C,d,A,b)
-
-# == form a scalar loss and differentiate ==
-z_star.sum().backward()
-
-print(z_star) # optimal point $$z^*$$
-print(d.grad) # gradient (w.r.t. d)
-```
-<br>
-
-The key mathematical structure we use to aid modularity is the special polyhedral geometry of a QP. 
-This is illustrated below, where a QP is <u>locally</u> equivalent to a purely equality constrained problem, <i>i.e.</i>, both their solutions and derivatives match.
-
-<p align="center">
-<img src="images/figure_methods_schematic_light.png" alt="teaser" width="500"/>
-</p>
-
-
-## Installation
-
-### Install as a Package (Recommended)
-
-The easiest way to use dQP is to install it as a Python package:
-
-```bash
-# Clone the repository
-git clone https://github.com/your-org/dQP.git
-cd dQP
-
-# Install with pip (editable mode for development)
-pip install -e .
-
-# Install with OSQP solver support
-pip install -e ".[osqp]"
-
-# Install with all supported solvers
-pip install -e ".[full]"
-```
-
-### Manual Environment Setup
-
-Alternatively, you can set up the environment manually:
-
-```bash
-conda create -y --name dQP python=3.9
-conda activate dQP
-pip install torch==2.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html scipy numpy qpsolvers 
-pip install clarabel cvxopt daqp ecos gurobipy highspy mosek osqp piqp proxsuite qpalm quadprog scs 
-pip install qdldl pypardiso 
-pip install torch_geometric torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
-```
-
-This includes PyTorch, open-source python interfaces to various QP and linear solvers, and tools for sparsity. Some QP solvers such as Gurobi are commercial, but offer [[academic licenses]](https://www.gurobi.com/academia/academic-program-and-licenses/). 
-Experiment-specific packages are detailed in the experiment section.
-
-## Quick Start with OSQP
-
-Here's a simple example using the OSQP solver:
+and is used as in the following example which uses QP solver [[OSQP]](https://github.com/osqp/osqp) and sparse symmetric indefinite linear solver [[QDLDL]](https://github.com/osqp/qdldl-python),
 
 ```python
 import torch
@@ -111,24 +41,41 @@ q_torch = torch.tensor(q, dtype=torch.float64, requires_grad=True)
 C_torch = csc_scipy_to_torch(C)
 d_torch = torch.tensor(d, dtype=torch.float64, requires_grad=True)
 
-# Build settings with OSQP solver
+# Build settings with OSQP forward solver and qdldl backward solver
 settings = dQP.build_settings(
     solve_type="sparse",
     qp_solver="osqp",
-    lin_solver="scipy SPLU",
+    lin_solver="qdldl",
 )
 
 # Create layer and solve
 layer = dQP.dQP_layer(settings=settings)
 x_star, lambda_star, mu_star, _, _ = layer(P_torch, q_torch, C_torch, d_torch)
 
-# Backpropagate
+# Backpropagate (differentiate) through scalar loss L(x^*) = sum(x^*)
 x_star.sum().backward()
 print(f"Solution: {x_star.detach().numpy()}")  # [0.5, 0.5]
 print(f"Gradient w.r.t. d: {d_torch.grad.numpy()}")
 ```
 
-For more examples, see `examples/osqp_example.py`.
+The key mathematical structure we use to aid modularity is the special polyhedral geometry of a QP. 
+This is illustrated below, where a QP is <u>locally</u> equivalent to a purely equality constrained problem, <i>i.e.</i>, both their solutions and derivatives match.
+
+<p align="center">
+<img src="images/figure_methods_schematic_light.png" alt="teaser" width="500"/>
+</p>
+
+
+## Installation
+
+```bash
+git clone https://github.com/cwmagoon/dQP
+cd dQP
+pip install -e .
+```
+
+This includes PyTorch, open-source python interfaces to various QP and linear solvers, and tools for sparsity. Some QP solvers such as Gurobi are commercial, but offer [[academic licenses]](https://www.gurobi.com/academia/academic-program-and-licenses/). 
+Experiment-specific packages are detailed in the experiment section.
 
 ## Options
 
@@ -156,26 +103,37 @@ While dQP described in the snippet above suppresses default options, dQP has the
 <b> Which solver do I choose for my problem? </b> First, we suggest perusing open-source benchmarks and the basic classes of QP solver. 
 For more information, we include a simple diagnostic tool which iterates through available QP solvers and times the forward/backward solves of your example QP (Fig. 6).
 
-## Experiments
+## Development Setup and Experiments
 
-We provide the code for our experiments in the experiments folder, including some additional directions on running them at the following:
+<details>
+<summary>
+This script sets up the environment we used for development/experiments
+</summary>
+
+```bash
+conda create -y --name dQP python=3.9
+conda activate dQP
+
+pip install torch==2.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html scipy numpy qpsolvers 
+pip install clarabel cvxopt daqp ecos gurobipy highspy mosek osqp piqp proxsuite qpalm quadprog scs 
+pip install qdldl pypardiso 
+
+pip install optnet qpth cvxpylayers proxsuite
+    
+pip install matplotlib tensorboard pandas
+
+pip install setproctitle
+
+pip install torch_geometric torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+pip install libigl polyscope shapely robust_laplacian torchvision==0.18
+conda install -c conda-forge ffmpeg
+```
+</details>
+
+
+
+<br>We provide the code for our experiments in the experiments folder, including some additional directions on running them at the following:
 
 * [Benchmark Experiment](./experiments/mega_test/README.md) 
 * [Sudoku Experiment](./experiments/sudoku/README.md)
 * [Geometry Experiment](./experiments/geometry/README.md)
-
-<details>
-  <summary>For these experiments, additional packages are required for setup or visualization:
-</summary>
-
-    pip install optnet qpth cvxpylayers proxsuite
-    
-    pip install matplotlib tensorboard pandas
-    
-    pip install setproctitle
-    
-    pip install libigl polyscope shapely robust_laplacian torchvision==0.18
-    conda install -c conda-forge ffmpeg
-</details>
-
-

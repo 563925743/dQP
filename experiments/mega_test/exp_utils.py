@@ -13,7 +13,9 @@ import scipy.sparse as spa
 import matplotlib.pyplot as plt
 import networkx as nx
 sys.path.append('../../')
-from src import dQP
+sys.path.append('../')
+
+from dqp import dQP
 import cvxpy as cp
 from cvxpylayers.torch import CvxpyLayer as CvxpyLayer_fun
 from proxsuite.torch.qplayer import QPFunction as prox_qpfunction

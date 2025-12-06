@@ -9,13 +9,13 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 
-sys.path.append('../../src')
+# sys.path.append('../../src')
 import dQP
 import lin_solvers
 
 # use in debugging mode in forward of dQP
 # example:
-# from src.qp_diagnostic import save_for_benchmark
+# from dqp.qp_diagnostic import save_for_benchmark
 
 # save_for_benchmark("cross",sparse_helper.csc_torch_to_scipy(Q),q.detach().numpy(),sparse_helper.csc_torch_to_scipy(G),h.detach().numpy(),sparse_helper.csc_torch_to_scipy(A),b.detach().numpy())
 # save_for_benchmark("sudoku3x3",Q.detach().numpy(),q.detach().numpy(),G.detach().numpy(),h.detach().numpy(),A.detach().numpy(),b.detach().numpy())

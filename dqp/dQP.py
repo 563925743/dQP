@@ -34,6 +34,8 @@ from joblib import Parallel, delayed
 ####################### Notes for TODO items
 # (0) Batching is w.r.t. all parameters. Requires duplication if some parameters are fixed. ==> TODO: remove duplication
 # (1) if nActive = 0 then back-propagation through nu_star will yield dL/dG, dL/dh = None. ==> TODO: output zeros
+
+# C,d required, but an obvious hack is to set C = row of 0's , d = 1
 #######################
 
 class dQP_layer(nn.Module):
@@ -150,6 +152,8 @@ class dQP_layer(nn.Module):
                     normalize_time = time.time() - start_normalize
 
                     print("### Time normalize: " + str(normalize_time))
+                else:
+                    normalize_time = 0 
 
                 # convert and store in numpy as dense or sparse
                 start_convert = time.time()
@@ -612,9 +616,12 @@ class dQP_layer(nn.Module):
                 "nActive": self.nActive,
                 "non_differentiable": self.non_differentiable,
                 # internally converts csc --> coo to get indices
-                "Q_pattern": None if (Q.layout is torch.strided) else self.Q_np.nonzero(),
-                "G_pattern": None if (G.layout is torch.strided) else (self.G_np[self.active, :]).nonzero(),
-                "A_pattern": None if ((A is None) or (A.layout is torch.strided)) else self.A_np.nonzero()
+                # "Q_pattern": None if (Q.layout is torch.strided) else self.Q_np.nonzero(),
+                # "G_pattern": None if (G.layout is torch.strided) else (self.G_np[self.active, :]).nonzero(),
+                # "A_pattern": None if ((A is None) or (A.layout is torch.strided)) else self.A_np.nonzero() # 1/23/2025 noticed that these operations in numpy eliminate any 0s and may change size w.r.t. input. Cannot fix in torch, so just avoid it in scipy.
+                "Q_pattern": None if (Q.layout is torch.strided) else [self.Q_np.tocoo().row, self.Q_np.tocoo().col],
+                "G_pattern": None if (G.layout is torch.strided) else [(self.G_np[self.active, :]).tocoo().row, (self.G_np[self.active, :]).tocoo().col],
+                "A_pattern": None if ((A is None) or (A.layout is torch.strided)) else [self.A_np.tocoo().row, self.A_np.tocoo().col]
             }
 
             if self.solve_type == "sparse": # does not compute gradient w.r.t. zero entries

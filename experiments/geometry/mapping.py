@@ -9,11 +9,11 @@ from examples import load_mesh
 from qpsolvers import solve_qp
 import sys
 sys.path.append('../../')
-sys.path.append('../../src') # to see qp_diagnostic if needed
+sys.path.append('../../dqp') # to see qp_diagnostic if needed
 
 from matplotlib import pyplot as plt
 
-from src import sparse_helper
+from dqp import sparse_helper
 
 import torch
 
@@ -437,7 +437,7 @@ args = parser.parse_args()
 main(lambda_reg=args.lambda_reg,option=args.example)
 
 # note, the ant set-up takes a long time (setting up BCS, constructing matrices, etc) but could be improved significantly, we only focus on profiling the QP solve.
-# main(lambda_reg=0,option="corner") # to isolate dQP backward timing, need to enable directly in dQP backward inside src
+# main(lambda_reg=0,option="corner") # to isolate dQP backward timing, need to enable directly in dQP backward inside dqp src
 # main(lambda_reg=0,option="cross")
 # main(lambda_reg=10,option="cross")
 # main(lambda_reg=0,option="parameterization")

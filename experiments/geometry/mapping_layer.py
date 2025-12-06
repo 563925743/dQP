@@ -4,7 +4,7 @@ import sys
 sys.path.append('../../')
 sys.path.append('../')
 
-from src import dQP,sparse_helper
+from dqp import dQP,sparse_helper
 import torch_geometric
 
 import torch

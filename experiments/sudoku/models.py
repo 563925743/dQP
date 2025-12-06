@@ -13,7 +13,7 @@ from qpth.qp import QPFunction
 
 import sys
 sys.path.append('../../')
-from src import dQP
+from dqp import dQP
 
 
 # modified to be on CPU
