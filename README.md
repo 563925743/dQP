@@ -4,10 +4,19 @@
 Accepted. <i>NeurIPS (2025)</i>
 
 <p align=center>
-  <img src="images/figure_introduction_increasing_structure_light.png" alt="teaser" width="300" />
+  <img src="https://github.com/cwmagoon/dQP/blob/main/images/figure_introduction_increasing_structure_light.png?raw=true" alt="teaser" width="300" />
   <span style="display:inline-block; width: 100px;"></span> <!-- Spacer element -->
-  <img src="images/figure_introduction_geometry_ant_light.png" alt="teaser" width="300"  />
+  <img src="https://github.com/cwmagoon/dQP/blob/main/images/figure_introduction_geometry_ant_light.png?raw=true" alt="teaser" width="300"  />
 </p>
+
+## Installation
+
+```bash
+pip install libdqp
+```
+
+This includes PyTorch, open-source python interfaces to various QP and linear solvers, and tools for sparsity. Some QP solvers such as Gurobi are commercial, but offer [[academic licenses]](https://www.gurobi.com/academia/academic-program-and-licenses/). 
+Experiment-specific packages are detailed in the experiment section.
 
 ## Introduction
 
@@ -16,7 +25,7 @@ dQP supports <u>over 15 state-of-the-art QP solvers</u> by attaching a custom Py
 It solves problems of the form,
 
 <p align="center">
-<img src="images/QP_formulation.png" alt="QP" width="500"/>
+<img src="https://github.com/cwmagoon/dQP/blob/main/images/QP_formulation.png?raw=true" alt="QP" width="500"/>
 </p>
 
 and is used as in the following example which uses QP solver [[OSQP]](https://github.com/osqp/osqp) and sparse symmetric indefinite linear solver [[QDLDL]](https://github.com/osqp/qdldl-python),
@@ -62,20 +71,8 @@ The key mathematical structure we use to aid modularity is the special polyhedra
 This is illustrated below, where a QP is <u>locally</u> equivalent to a purely equality constrained problem, <i>i.e.</i>, both their solutions and derivatives match.
 
 <p align="center">
-<img src="images/figure_methods_schematic_light.png" alt="teaser" width="500"/>
+<img src="https://github.com/cwmagoon/dQP/blob/main/images/figure_methods_schematic_light.png?raw=true" alt="teaser" width="500"/>
 </p>
-
-
-## Installation
-
-```bash
-git clone https://github.com/cwmagoon/dQP
-cd dQP
-pip install -e .
-```
-
-This includes PyTorch, open-source python interfaces to various QP and linear solvers, and tools for sparsity. Some QP solvers such as Gurobi are commercial, but offer [[academic licenses]](https://www.gurobi.com/academia/academic-program-and-licenses/). 
-Experiment-specific packages are detailed in the experiment section.
 
 ## Options
 
@@ -107,10 +104,23 @@ For more information, we include a simple diagnostic tool which iterates through
 
 <details>
 <summary>
-This script sets up the environment we used for development/experiments
+This script sets up the environment distributed with PyPI:
 </summary>
 
 ```bash
+git clone https://github.com/cwmagoon/dQP
+cd dQP
+conda create -y --name dQP python=3.9
+conda activate dQP
+pip install -e .
+```
+
+
+This script includes this and provides additional dependencies used in the experiments:
+
+```bash
+git clone https://github.com/cwmagoon/dQP
+cd dQP
 conda create -y --name dQP python=3.9
 conda activate dQP
 
