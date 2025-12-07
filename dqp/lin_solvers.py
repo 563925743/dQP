@@ -7,7 +7,7 @@ import qpsolvers
 dense_solvers = ["scipy LU","scipy LDL"]
 sparse_solvers = ["scipy SPLU"]
 
-from .set_solver_tolerance import set_solver_tolerance
+from dqp.set_solver_tolerance import set_solver_tolerance
 from scipy.sparse import csc_matrix # qp solvers uses csc
 
 try:

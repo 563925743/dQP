@@ -1,3 +1,5 @@
+# This file should be run from this folder
+
 import unittest
 import dQP
 import numpy as np

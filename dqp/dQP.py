@@ -18,9 +18,9 @@ src_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(src_dir)
 sys.path.append(parent_dir)
 
-from .set_solver_tolerance import set_solver_tolerance
-from . import sparse_helper
-from . import lin_solvers
+from dqp.set_solver_tolerance import set_solver_tolerance
+from dqp import sparse_helper
+from dqp import lin_solvers
 import time
 
 # CPU parallelism
@@ -1204,8 +1204,8 @@ def build_settings(check_PSD=False,time=False,solve_type="dense",dual_available=
         assert(lin_solver in lin_solvers.get_dense_solvers())
     elif solve_type == "sparse":
         if qp_solver is None: # get first available qp solver
-            if "gurobi" in qpsolvers.sparse_solvers:
-                qp_solver = "gurobi"
+            if "osqp" in qpsolvers.sparse_solvers:
+                qp_solver = "osqp" # another good default is gurobi, if have license
             else:
                 qp_solver = qpsolvers.sparse_solvers[0]
         if lin_solver is None:
