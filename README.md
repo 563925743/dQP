@@ -10,7 +10,7 @@
 </p>
 
 ## Installation
-
+       
 [![PyPI version](https://img.shields.io/pypi/v/libdqp.svg)](https://pypi.org/project/libdqp/)
 ```bash
 pip install libdqp
